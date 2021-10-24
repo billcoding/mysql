@@ -1,4 +1,4 @@
-module github.com/billcoding/gfm
+module github.com/billcoding/mysql
 
 go 1.17
 
