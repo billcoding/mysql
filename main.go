@@ -16,15 +16,15 @@ var (
 	passwd   = flag.String("p", "", "The MySQL Server password")
 	user     = flag.String("u", "root", "The MySQL Server username")
 	database = flag.String("d", "test", "The MySQL Server database")
-	help     = flag.Bool("h", false, "Help for gfm")
+	help     = flag.Bool("h", false, "Help for mysql")
 )
 
 func printUsage() {
-	fmt.Println(`gfm
+	fmt.Println(`mysql
 A mysql client(or terminal) written in Golang
 
 examples:
-gfm -u="username" -p="password" -d="awesome_db"
+mysql -u="username" -p="password" -d="awesome_db"
 
 options:`)
 	flag.PrintDefaults()
