@@ -30,10 +30,13 @@ func executeCmd(db *sql.DB, cmd string) {
 		return
 	}
 
+	cacheCommands = append(cacheCommands, cmd)
+
 	// cmd `USE $DB`
 	_cmd := strings.TrimSuffix(strings.TrimSpace(cmd), ";")
 	if strings.Contains(strings.ToUpper(_cmd), "USE ") {
 		*database = strings.TrimSpace(_cmd[3:])
+		reconnect()
 	}
 
 	defer func() { _ = rows.Close() }()
@@ -55,7 +58,7 @@ func executeCmd(db *sql.DB, cmd string) {
 		var dist = make([]interface{}, len(columnTypes))
 		for i, ct := range columnTypes {
 			switch ct.DatabaseTypeName() {
-			case "VARCHAR", "TEXT", "LONGTEXT", "DATETIME", "DATE", "TIMESTAMP":
+			case "CHAR", "VARCHAR", "TEXT", "LONGTEXT", "DATETIME", "DATE", "TIMESTAMP":
 				var varcharVal sql.NullString
 				dist[i] = &varcharVal
 			case "INT", "TINYINT", "BIGINT":

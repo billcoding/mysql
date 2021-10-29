@@ -11,12 +11,14 @@ import (
 )
 
 var (
-	host     = flag.String("H", "localhost", "The MySQL Server host name")
-	port     = flag.Int("P", 3306, "The MySQL Server port")
-	passwd   = flag.String("p", "", "The MySQL Server password")
-	user     = flag.String("u", "root", "The MySQL Server username")
-	database = flag.String("d", "test", "The MySQL Server database")
-	help     = flag.Bool("h", false, "Help for mysql")
+	host          = flag.String("H", "localhost", "The MySQL Server host name")
+	port          = flag.Int("P", 3306, "The MySQL Server port")
+	passwd        = flag.String("p", "", "The MySQL Server password")
+	user          = flag.String("u", "root", "The MySQL Server username")
+	database      = flag.String("d", "test", "The MySQL Server database")
+	help          = flag.Bool("h", false, "Help for mysql")
+	cacheCommands = make([]string, 0)
+	db            *sql.DB
 )
 
 func printUsage() {
@@ -30,25 +32,25 @@ options:`)
 	flag.PrintDefaults()
 }
 
+func reconnect() error {
+	var err error
+	DSN := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", *user, *passwd, *host, *port, *database)
+	db, err = sql.Open("mysql", DSN)
+	db.SetMaxIdleConns(2)
+	db.SetMaxOpenConns(10)
+	db.SetConnMaxIdleTime(time.Minute)
+	err = db.Ping()
+	return err
+}
+
 func main() {
 	flag.Parse()
 	if *help {
 		printUsage()
 		return
 	}
-	DSN := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", *user, *passwd, *host, *port, *database)
-	db, err := sql.Open("mysql", DSN)
-	db.SetMaxIdleConns(2)
-	db.SetMaxOpenConns(10)
-	db.SetConnMaxIdleTime(time.Minute)
-	defer func() { _ = db.Close() }()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	err = db.Ping()
-	if err != nil {
-		fmt.Println(err)
+	if err2 := reconnect(); err2 != nil {
+		fmt.Println(err2)
 		return
 	}
 	fmt.Printf("Connected: %s\n", *host)
