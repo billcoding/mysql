@@ -11,14 +11,14 @@ import (
 )
 
 var (
-	host          = flag.String("H", "localhost", "The MySQL Server host name")
-	port          = flag.Int("P", 3306, "The MySQL Server port")
-	passwd        = flag.String("p", "", "The MySQL Server password")
-	user          = flag.String("u", "root", "The MySQL Server username")
-	database      = flag.String("d", "test", "The MySQL Server database")
-	help          = flag.Bool("h", false, "Help for mysql")
-	cacheCommands = make([]string, 0)
-	db            *sql.DB
+	host     = flag.String("H", "localhost", "The MySQL Server host name")
+	port     = flag.Int("P", 3306, "The MySQL Server port")
+	passwd   = flag.String("p", "", "The MySQL Server password")
+	user     = flag.String("u", "root", "The MySQL Server username")
+	database = flag.String("d", "test", "The MySQL Server database")
+	command  = flag.String("c", "", "Connect to MySQL Server execute command, and exit")
+	help     = flag.Bool("h", false, "Help for mysql")
+	db       *sql.DB
 )
 
 func printUsage() {
@@ -27,6 +27,7 @@ A mysql client(or terminal) written in Golang
 
 examples:
 mysql -u="username" -p="password" -d="awesome_db"
+mysql -u="username" -p="password" -d="awesome_db" -c="SELECT NOW() AS t"
 
 options:`)
 	flag.PrintDefaults()
@@ -55,6 +56,12 @@ func main() {
 	}
 	fmt.Printf("Connected: %s\n", *host)
 	fmt.Printf("Server version: %s\n", showServerVersion(db))
+
+	if *command != "" {
+		executeCmd(db, *command)
+		return
+	}
+
 	for {
 		fmt.Printf("(%s)>", *database)
 		scanner := bufio.NewScanner(os.Stdin)

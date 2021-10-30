@@ -30,13 +30,11 @@ func executeCmd(db *sql.DB, cmd string) {
 		return
 	}
 
-	cacheCommands = append(cacheCommands, cmd)
-
 	// cmd `USE $DB`
 	_cmd := strings.TrimSuffix(strings.TrimSpace(cmd), ";")
 	if strings.Contains(strings.ToUpper(_cmd), "USE ") {
 		*database = strings.TrimSpace(_cmd[3:])
-		reconnect()
+		_ = reconnect()
 	}
 
 	defer func() { _ = rows.Close() }()
