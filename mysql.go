@@ -54,18 +54,20 @@ func executeCmd(db *sql.DB, cmd string) {
 	}
 	for rows.Next() {
 		var dist = make([]interface{}, len(columnTypes))
-		for i, ct := range columnTypes {
-			switch ct.DatabaseTypeName() {
-			case "CHAR", "VARCHAR", "TEXT", "LONGTEXT", "DATETIME", "DATE", "TIMESTAMP":
-				var varcharVal sql.NullString
-				dist[i] = &varcharVal
-			case "INT", "TINYINT", "BIGINT":
-				var intVal sql.NullInt64
-				dist[i] = &intVal
-			case "FLOAT", "DECIMAL":
-				var floatVal sql.NullFloat64
-				dist[i] = &floatVal
-			}
+		for i := range columnTypes {
+			var varcharVal sql.NullString
+			dist[i] = &varcharVal
+			//switch ct.DatabaseTypeName() {
+			//case "CHAR", "VARCHAR", "TEXT", "LONGTEXT", "DATETIME", "DATE", "TIMESTAMP":
+			//	var varcharVal sql.NullString
+			//	dist[i] = &varcharVal
+			//case "INT", "TINYINT", "BIGINT":
+			//	var intVal sql.NullInt64
+			//	dist[i] = &intVal
+			//case "FLOAT", "DECIMAL":
+			//	var floatVal sql.NullFloat64
+			//	dist[i] = &floatVal
+			//}
 		}
 		err = rows.Scan(dist...)
 		if err != nil {
